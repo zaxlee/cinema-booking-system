@@ -2,6 +2,8 @@ package com.zaxlee.cinema.service;
 
 import com.zaxlee.cinema.dto.request.CreateBookingRequest;
 import com.zaxlee.cinema.dto.response.BookingResponse;
+import com.zaxlee.cinema.exception.ResourceNotFoundException;
+import com.zaxlee.cinema.exception.SeatAlreadyBookedException;
 import com.zaxlee.cinema.model.Booking;
 import com.zaxlee.cinema.model.Movie;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,7 @@ public class BookingService {
         int seatNumber = request.getSeatNumber();
 
         if (!movie.isSeatAvailable(seatNumber)) {
-            throw new IllegalStateException("Seat is not available");
+            throw new SeatAlreadyBookedException("Seat is already booked");
         }
 
         movie.bookSeat(seatNumber);
@@ -55,7 +57,7 @@ public class BookingService {
         Booking booking = bookingStore.get(bookingId);
 
         if (booking == null) {
-            throw new RuntimeException("Booking not found with id: " + bookingId);
+            throw new ResourceNotFoundException("Booking not found with id: " + bookingId);
         }
 
         return mapToResponse(booking);

@@ -2,6 +2,7 @@ package com.zaxlee.cinema.service;
 
 import com.zaxlee.cinema.dto.request.CreateMovieRequest;
 import com.zaxlee.cinema.dto.response.MovieResponse;
+import com.zaxlee.cinema.exception.ResourceNotFoundException;
 import com.zaxlee.cinema.model.Movie;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,7 @@ public class MovieService {
 
     public void deleteMovie(Long movieId) {
         if (!movieStore.containsKey(movieId)) {
-            throw new RuntimeException("Movie not found with id: " + movieId);
+            throw new ResourceNotFoundException("Movie not found with id: " + movieId);
         }
 
         movieStore.remove(movieId);
@@ -52,7 +53,7 @@ public class MovieService {
         Movie movie = movieStore.get(movieId);
 
         if (movie == null) {
-            throw new RuntimeException("Movie not found with id: " + movieId);
+            throw new ResourceNotFoundException("Movie not found with id: " + movieId);
         }
 
         return movie;
