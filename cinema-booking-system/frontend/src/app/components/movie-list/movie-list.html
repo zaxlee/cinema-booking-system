@@ -1,0 +1,15 @@
+<h2>Movies</h2>
+
+<table border="1">
+  <tr>
+    <th>Title</th>
+    <th>Show Time</th>
+    <th>Available Seats</th>
+  </tr>
+
+  <tr *ngFor="let movie of movies">
+    <td>{{ movie.title }}</td>
+    <td>{{ movie.showTime }}</td>
+    <td>{{ movie.availableSeats }}</td>
+  </tr>
+</table>
