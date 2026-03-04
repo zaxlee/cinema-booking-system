@@ -3,7 +3,7 @@
   <button (click)="logout()">Logout</button>
 </div>
 
-<p *ngIf="loading">Loading movies...</p>
+<p *ngIf="loading">Refreshing movies...</p>
 
 <p *ngIf="!loading && movies.length === 0">
   No movies available
@@ -26,7 +26,7 @@
 
 </div>
 
-<table border="1" *ngIf="!loading && movies.length > 0">
+<table border="1" *ngIf="movies.length > 0">
   <tr>
     <th>Title</th>
     <th>Show Time</th>
@@ -36,11 +36,10 @@
 
   <tr *ngFor="let movie of movies">
     <td>{{ movie.title }}</td>
-    <td>{{ movie.showTime }}</td>
-    <td>{{ movie.availableSeats }}</td>
+    <td>{{ movie.showTime | date:'EEE, dd MMM yyyy HH:mm' }}</td>
+    <td>{{ movie.availableSeats }} seats</td>
 
     <td>
-
       <button (click)="bookSeat(movie.id)">
         Book Seat
       </button>
@@ -48,8 +47,6 @@
       <button *ngIf="role === 'ADMIN'" (click)="deleteMovie(movie.id)">
         Delete
       </button>
-
     </td>
   </tr>
-
 </table>

@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { MovieService } from '../../services/movie';
 
 @Component({
   selector: 'app-movie-list',
@@ -15,15 +15,18 @@ import { jwtDecode } from 'jwt-decode';
 export class MovieList implements OnInit {
 
   movies: any[] = [];
-  loading = true;
-
+  loading = false;
   role: string = '';
 
   newTitle = '';
   newShowTime = '';
   newTotalSeats = 0;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private movieService: MovieService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
 
@@ -37,31 +40,25 @@ export class MovieList implements OnInit {
     this.loadMovies();
   }
 
-  getHeaders() {
-    const token = localStorage.getItem('token');
-
-    return new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
-  }
-
   loadMovies() {
 
     this.loading = true;
 
-    this.http.get<any[]>('http://localhost:8080/movies', {
-      headers: this.getHeaders()
-    })
-    .subscribe({
-      next: (data) => {
-        this.movies = data;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error("Failed to load movies", err);
-        this.loading = false;
-      }
-    });
+    this.movieService.getMovies()
+      .subscribe({
+        next: (data) => {
+          this.movies = data;
+          this.loading = false;
+
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error("Failed to load movies", err);
+          this.loading = false;
+
+          this.cdr.detectChanges();
+        }
+      });
 
   }
 
@@ -73,66 +70,38 @@ export class MovieList implements OnInit {
       totalSeats: this.newTotalSeats
     };
 
-    this.http.post<any>('http://localhost:8080/movies', movie, {
-      headers: this.getHeaders()
-    })
-    .subscribe({
-      next: (createdMovie) => {
-
-        this.movies.push(createdMovie);
+    this.movieService.addMovie(movie)
+      .subscribe(() => {
 
         this.newTitle = '';
         this.newShowTime = '';
         this.newTotalSeats = 0;
 
-      },
-      error: (err) => {
-        console.error("Failed to add movie", err);
-      }
-    });
+        this.loadMovies();
+
+      });
 
   }
 
   deleteMovie(id: number) {
 
-    this.http.delete(`http://localhost:8080/movies/${id}`, {
-      headers: this.getHeaders()
-    })
-    .subscribe({
-      next: () => {
-
-        this.movies = this.movies.filter(m => m.id !== id);
-
-      },
-      error: (err) => {
-        console.error("Failed to delete movie", err);
-      }
-    });
+    this.movieService.deleteMovie(id)
+      .subscribe(() => {
+        this.loadMovies();
+      });
 
   }
 
   bookSeat(movieId: number) {
 
-    const booking = {
-      movieId: movieId,
-      seatNumber: Math.floor(Math.random() * 100) + 1
-    };
-
-    this.http.post('http://localhost:8080/bookings', booking, {
-      headers: this.getHeaders()
-    })
-    .subscribe({
-      next: () => {
+    this.movieService.bookSeat(movieId)
+      .subscribe(() => {
 
         alert("Seat booked successfully!");
 
         this.loadMovies();
 
-      },
-      error: (err) => {
-        console.error("Booking failed", err);
-      }
-    });
+      });
 
   }
 
