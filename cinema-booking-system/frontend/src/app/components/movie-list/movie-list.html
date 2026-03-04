@@ -1,18 +1,32 @@
-<h2>Movies</h2>
+<div style="display:flex; justify-content:space-between; align-items:center;">
+  <h2>Movies</h2>
+  <button (click)="logout()">Logout</button>
+</div>
 
-<h3>Add Movie (Admin)</h3>
+<p *ngIf="loading">Loading movies...</p>
 
-<input placeholder="Title" [(ngModel)]="newTitle">
+<p *ngIf="!loading && movies.length === 0">
+  No movies available
+</p>
 
-<input type="datetime-local" [(ngModel)]="newShowTime">
+<!-- ADMIN SECTION -->
+<div *ngIf="role === 'ADMIN'">
 
-<input type="number" placeholder="Total Seats" [(ngModel)]="newTotalSeats">
+  <h3>Add Movie (Admin)</h3>
 
-<button (click)="addMovie()">Add Movie</button>
+  <input placeholder="Title" [(ngModel)]="newTitle">
 
-<hr>
+  <input type="datetime-local" [(ngModel)]="newShowTime">
 
-<table border="1">
+  <input type="number" placeholder="Total Seats" [(ngModel)]="newTotalSeats">
+
+  <button (click)="addMovie()">Add Movie</button>
+
+  <hr>
+
+</div>
+
+<table border="1" *ngIf="!loading && movies.length > 0">
   <tr>
     <th>Title</th>
     <th>Show Time</th>
@@ -26,8 +40,16 @@
     <td>{{ movie.availableSeats }}</td>
 
     <td>
-      <button (click)="bookSeat(movie.id)">Book Seat</button>
-      <button (click)="deleteMovie(movie.id)">Delete</button>
+
+      <button (click)="bookSeat(movie.id)">
+        Book Seat
+      </button>
+
+      <button *ngIf="role === 'ADMIN'" (click)="deleteMovie(movie.id)">
+        Delete
+      </button>
+
     </td>
   </tr>
+
 </table>
