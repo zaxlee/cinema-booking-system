@@ -9,6 +9,10 @@
   No movies available
 </p>
 
+<div *ngIf="errorMessage" style="background:#ffe5e5;color:#b00020;padding:10px;border-radius:6px;margin-bottom:10px;">
+  {{ errorMessage }}
+</div>
+
 <!-- ADMIN SECTION -->
 <div *ngIf="role === 'ADMIN'">
 
